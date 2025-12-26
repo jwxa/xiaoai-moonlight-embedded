@@ -169,7 +169,7 @@ static void add_gamepad(int joystick_index) {
 
 #if !SDL_VERSION_ATLEAST(2, 0, 9)
   state->haptic = SDL_HapticOpenFromJoystick(joystick);
-  if (haptic && (SDL_HapticQuery(state->haptic) & SDL_HAPTIC_LEFTRIGHT) == 0) {
+  if (state->haptic && (SDL_HapticQuery(state->haptic) & SDL_HAPTIC_LEFTRIGHT) == 0) {
     SDL_HapticClose(state->haptic);
     state->haptic = NULL;
   }

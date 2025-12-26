@@ -102,6 +102,9 @@ enum platform platform_check(char* name) {
   if (strcmp(name, "fake") == 0)
     return FAKE;
 
+  if (strcmp(name, "oh2p") == 0)
+    return OH2P;
+
   return 0;
 }
 
@@ -176,6 +179,9 @@ DECODER_RENDERER_CALLBACKS* platform_get_video(enum platform system) {
   case RK:
     return (PDECODER_RENDERER_CALLBACKS) dlsym(RTLD_DEFAULT, "decoder_callbacks_rk");
   #endif
+  case OH2P:
+    // Audio-only platform, no video rendering
+    return NULL;
   }
   return NULL;
 }
@@ -194,6 +200,14 @@ AUDIO_RENDERER_CALLBACKS* platform_get_audio(enum platform system, char* audio_d
       return (PAUDIO_RENDERER_CALLBACKS) dlsym(RTLD_DEFAULT, "audio_callbacks_omx");
     // fall-through
   #endif
+  case OH2P:
+    // Audio-only platform using ALSA
+    #ifdef HAVE_ALSA
+    return &audio_callbacks_alsa;
+    #else
+    fprintf(stderr, "OH2P platform requires ALSA support\n");
+    return NULL;
+    #endif
   default:
     #ifdef HAVE_PULSE
     if (audio_pulse_init(audio_device))
@@ -248,6 +262,8 @@ char* platform_name(enum platform system) {
     return "SDL2 (software decoding)";
   case FAKE:
     return "Fake (no a/v output)";
+  case OH2P:
+    return "OH2P (audio-only streaming)";
   default:
     return "Unknown";
   }
