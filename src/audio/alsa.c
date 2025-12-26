@@ -58,7 +58,7 @@ static int alsa_renderer_init(int audioConfiguration, POPUS_MULTISTREAM_CONFIGUR
   snd_pcm_hw_params_t *hw_params;
   snd_pcm_sw_params_t *sw_params;
   snd_pcm_uframes_t period_size = (opusConfig->sampleRate * 20) / 1000; // 20 ms period
-  snd_pcm_uframes_t buffer_size = 3 * period_size; // 60 ms buffer
+  snd_pcm_uframes_t buffer_size = 8 * period_size; // 160 ms buffer (increased from 60ms)
   unsigned int sampleRate = opusConfig->sampleRate;
 
   char* audio_device = (char*) context;
@@ -84,7 +84,7 @@ static int alsa_renderer_init(int audioConfiguration, POPUS_MULTISTREAM_CONFIGUR
   CHECK_RETURN(snd_pcm_sw_params_malloc(&sw_params));
   CHECK_RETURN(snd_pcm_sw_params_current(handle, sw_params));
   CHECK_RETURN(snd_pcm_sw_params_set_avail_min(handle, sw_params, period_size));
-  CHECK_RETURN(snd_pcm_sw_params_set_start_threshold(handle, sw_params, period_size));
+  CHECK_RETURN(snd_pcm_sw_params_set_start_threshold(handle, sw_params, buffer_size / 2)); // Start when buffer is half full
   CHECK_RETURN(snd_pcm_sw_params(handle, sw_params));
   snd_pcm_sw_params_free(sw_params);
 
