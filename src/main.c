@@ -215,6 +215,7 @@ static void help() {
   printf("\t-quitappafter\t\tSend quit app request to remote after quitting session\n");
   printf("\t-viewonly\t\tDisable all input processing (view-only mode)\n");
   printf("\t-nomouseemulation\t\tDisable gamepad mouse emulation support (long pressing Start button)\n");
+  printf("\t-audioonly\t\tStream only audio and control (no video)\n");
   #if defined(HAVE_SDL) || defined(HAVE_X11)
   printf("\n WM options (SDL and X11 only)\n\n");
   printf("\t-windowed\t\tDisplay screen in a window\n");
@@ -334,6 +335,12 @@ int main(int argc, char* argv[]) {
     if (config.hdr && !(config.stream.supportedVideoFormats & VIDEO_FORMAT_MASK_10BIT)) {
       fprintf(stderr, "HDR streaming requires HEVC or AV1 codec\n");
       exit(-1);
+    }
+
+    // Set audio-only mode if configured
+    config.stream.audioOnly = config.audioonly;
+    if (config.audioonly && config.debug_level > 0) {
+      printf("Audio-only mode enabled, video stream will be skipped\n");
     }
 
     #ifdef HAVE_SDL
